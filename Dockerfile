@@ -10,6 +10,8 @@ WORKDIR ${WWW_ROOT}
 
 COPY entrypoint.sh /
 
+ENTRYPOINT ["/entrypoint.sh"]
+
 RUN apt-key adv --keyserver hkp://pgp.mit.edu:80 --recv-keys 573BFD6B3D8FBC641079A6ABABF5BD827BD9BF62 && \
     echo "deb http://nginx.org/packages/mainline/debian/ jessie nginx" >> /etc/apt/sources.list && \
     apt-get update && \
@@ -25,8 +27,6 @@ COPY fpm /etc/php/fpm
 COPY supervisord.conf /etc/supervisord.conf
 COPY supervisor.d /etc/supervisor.d
 
-ENTRYPOINT ["/entrypoint.sh"]
-
 # Install require extension
 RUN apt-get update -y && apt-get install -y \
     git \
@@ -41,7 +41,6 @@ RUN apt-get update -y && apt-get install -y \
     && \
     docker-php-ext-configure gd --with-freetype-dir=/usr/include/ --with-jpeg-dir=/usr/include/ && \
     docker-php-ext-install -j$(nproc) bcmath bz2 gd mbstring mcrypt mysqli pdo_mysql zip && \
-#RUN docker-php-ext-install -j$(nproc) gd && \
     pecl install mongo redis memcached && \
     echo "extension=mongo.so" > /usr/local/etc/php/conf.d/mongo.ini && \
     echo "extension=redis.so" > /usr/local/etc/php/conf.d/redis.ini && \
